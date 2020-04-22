@@ -68,7 +68,7 @@ jobs:
         with:
             java-version: 11.0.4
       - name: Login to Docker Hub
-        run: docker login -u${{ secrets.DOCKER_USER}} -p {{secrets.DOCKER_PASS}}
+        run: docker login -u ${{ secrets.DOCKER_USER}} -p {{secrets.DOCKER_PASS}}
       - name: Build Docker image
         run: docker build -t $REPO:latest -t $REPO:${GITHUB SHA::B} .
       - name: Publish Docker Image
@@ -83,7 +83,7 @@ jobs:
       - name: Login to Heroku Container registry
         env:
             HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
-            run: heroku container:login
+        run: heroku container:login
       - name: build and push
         env:
             HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
