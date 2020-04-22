@@ -7,7 +7,6 @@ on:
 
 jobs:
 
-
   test:
     name: Test - Units & Integrations
     runs-on: ubuntu-18.04
@@ -17,14 +16,14 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-            java-version: 11.0.4
+          java-version: 11.0.4
       - name: Maven Package
         run: mvn -B clean package -DskipTests
-      - name: Maven verify 
+      - name: Maven Verify
         run: mvn -B clean verify -Pintegration-test
 
   sonar:
-    name: Test - SonarCloud scan
+    name: Test - SonarCloud Scan
     runs-on: ubuntu-18.04
 
     steps:
@@ -32,11 +31,11 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-            java-version: 11.0.4
+          java-version: 11.0.4
       - name: SonarCloud Scan
-        run: mvn -B clean verify -Psonar.login=${{ secrets.SONAR_TOKEN}}
+        run: mvn -B clean verify -Psonar -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         env:
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   artifact:
     name: Publish - GitHub Packages
@@ -48,11 +47,12 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-            java-version: 11.0.4
+          java-version: 11.0.4
       - name: Publish artifact on GitHub Packages
         run: mvn -B clean deploy -DskipTests
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
   docker:
     name: Publish - Docker Hub
@@ -67,10 +67,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
-      - name: Accesso a Docker Hub
+      - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
       - name: Build Docker image
-        run: docker build -t $REPO:latest $REPO:${GITHUB_SHA::8} .
+        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
       - name: Publish Docker image
         run: docker push $REPO
 
@@ -82,13 +82,13 @@ jobs:
       - uses: actions/checkout@v1
       - name: Login to Heroku Container registry
         env:
-            HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:login
-      - name: build and push
+      - name: Build and push
         env:
-            HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
-        run: heroku container:push -a ${{secrets.HEROKU_APP_NAME}} web
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} web
       - name: Release
         env:
-            HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
-        run: heroku container:release -a ${{secrets.HEROKU_APP_NAME}} web
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} web
